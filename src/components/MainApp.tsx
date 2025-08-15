@@ -26,7 +26,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Search, Plus, Bell, Settings, LogOut, Shield, Crown, Gift, Heart, User } from 'lucide-react';
+import { Search, Plus, Bell, Settings, LogOut, Shield, Crown, Gift, Heart, User, ArrowLeft } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 const mockPosts = [
@@ -119,6 +119,18 @@ export const MainApp = ({ onShowAdmin }: MainAppProps) => {
 
   const handlePostReport = (type: 'post', targetId: string, targetName?: string) => {
     handleReport(type, targetId, targetName);
+  };
+
+  const handleTabChange = (tab: string) => {
+    console.log('Tab change requested:', tab);
+    console.log('Previous active tab:', activeTab);
+    setActiveTab(tab);
+    console.log('New active tab set to:', tab);
+  };
+
+  const handleBackToHome = () => {
+    console.log('Back to home requested');
+    setActiveTab('home');
   };
 
   // Show welcome screen
@@ -240,13 +252,28 @@ export const MainApp = ({ onShowAdmin }: MainAppProps) => {
         );
       
       case 'search':
-        return <EnhancedSearch />;
+        console.log('Rendering EnhancedSearch component');
+        return (
+          <ErrorBoundary>
+            <EnhancedSearch />
+          </ErrorBoundary>
+        );
       
       case 'reels':
-        return <ReelsViewer />;
+        console.log('Rendering ReelsViewer component');
+        return (
+          <ErrorBoundary>
+            <ReelsViewer />
+          </ErrorBoundary>
+        );
       
       case 'live':
-        return <LiveStream />;
+        console.log('Rendering LiveStream component');
+        return (
+          <ErrorBoundary>
+            <LiveStream />
+          </ErrorBoundary>
+        );
       
       case 'arcade':
         console.log('Rendering ArcadePage component');
@@ -271,38 +298,92 @@ export const MainApp = ({ onShowAdmin }: MainAppProps) => {
         return <StreamerSubscriptionSetup />;
       
       case 'my-subscriptions':
-        return <StreamerSubscriptionStatus />;
+        console.log('Rendering StreamerSubscriptionStatus component');
+        return (
+          <ErrorBoundary>
+            <StreamerSubscriptionStatus />
+          </ErrorBoundary>
+        );
       
       case 'subscription-history':
-        return <SubscriptionHistoryPage />;
+        console.log('Rendering SubscriptionHistoryPage component');
+        return (
+          <ErrorBoundary>
+            <SubscriptionHistoryPage />
+          </ErrorBoundary>
+        );
       
       case 'messages':
-        return <MessagingPage />;
+        console.log('Rendering MessagingPage component');
+        return (
+          <ErrorBoundary>
+            <MessagingPage />
+          </ErrorBoundary>
+        );
       
       case 'notifications':
-        return <NotificationPage />;
+        console.log('Rendering NotificationPage component');
+        return (
+          <ErrorBoundary>
+            <NotificationPage />
+          </ErrorBoundary>
+        );
       
       case 'profile':
-        return <ProfilePage />;
+        console.log('Rendering ProfilePage component');
+        return (
+          <ErrorBoundary>
+            <ProfilePage />
+          </ErrorBoundary>
+        );
       
       case 'settings':
-        return <SettingsPage />;
+        console.log('Rendering SettingsPage component');
+        return (
+          <ErrorBoundary>
+            <SettingsPage />
+          </ErrorBoundary>
+        );
       
       case 'about':
-        return <AboutPage />;
+        console.log('Rendering AboutPage component');
+        return (
+          <ErrorBoundary>
+            <AboutPage />
+          </ErrorBoundary>
+        );
       
       case 'terms':
-        return <TermsPage />;
+        console.log('Rendering TermsPage component');
+        return (
+          <ErrorBoundary>
+            <TermsPage />
+          </ErrorBoundary>
+        );
       
       case 'privacy':
-        return <PrivacyPage />;
+        console.log('Rendering PrivacyPage component');
+        return (
+          <ErrorBoundary>
+            <PrivacyPage />
+          </ErrorBoundary>
+        );
       
       default:
+        console.log('Unknown tab:', activeTab, 'showing default content');
         return (
           <div className="p-6">
             <Card>
               <CardContent className="pt-6">
-                <p className="text-center text-muted-foreground font-inter">Content for {activeTab} coming soon!</p>
+                <h2 className="text-xl font-semibold text-center mb-4">Page Not Found</h2>
+                <p className="text-center text-muted-foreground font-inter mb-4">
+                  The page "{activeTab}" is not available yet.
+                </p>
+                <div className="text-center">
+                  <Button onClick={handleBackToHome} variant="outline">
+                    Back to Home
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -352,6 +433,16 @@ export const MainApp = ({ onShowAdmin }: MainAppProps) => {
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between sticky top-0 z-50 shadow-sm">
         <div className="flex items-center space-x-3">
+          {activeTab !== 'home' && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleBackToHome}
+              className="h-9 w-9 sm:h-10 sm:w-10"
+            >
+              <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+            </Button>
+          )}
           <img 
             src="/logo.svg" 
             alt="Treesh" 
@@ -466,7 +557,7 @@ export const MainApp = ({ onShowAdmin }: MainAppProps) => {
         {!isMobile && (
           <Navigation 
             activeTab={activeTab} 
-            onTabChange={setActiveTab} 
+            onTabChange={handleTabChange} 
             className="w-64 h-screen sticky top-16" 
           />
         )}
@@ -475,14 +566,14 @@ export const MainApp = ({ onShowAdmin }: MainAppProps) => {
           <ErrorBoundary>
             {renderContent()}
           </ErrorBoundary>
-          <Footer />
+          {activeTab === 'home' && <Footer />}
         </main>
       </div>
 
       {isMobile && (
         <MobileNavigation 
           activeTab={activeTab} 
-          onTabChange={setActiveTab} 
+          onTabChange={handleTabChange} 
         />
       )}
 
